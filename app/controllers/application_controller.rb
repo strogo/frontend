@@ -1,6 +1,7 @@
 require 'publisher_api'
 require 'imminence_api'
 require 'panopticon_api'
+require 'contactotron_api'
 
 class ApplicationController < ActionController::Base
   protect_from_forgery
@@ -32,5 +33,10 @@ class ApplicationController < ActionController::Base
   helper_method :artefact_api
   def artefact_api
     @artefact_api ||= PanopticonApi.new(panopticon_host)
+  end
+
+  helper_method :contact_api
+  def contact_api
+    @contact_api ||= ContactotronApi.new
   end
 end
