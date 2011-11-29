@@ -15,6 +15,7 @@ class RootController < ApplicationController
     expires_in 10.minute, :public => true unless Rails.env.development?
 
     @publication = fetch_publication(params)
+    @contact = fetch_contact(params)
     @video_mode = params[:part] == "video"
 
     assert_found(@publication)
@@ -91,8 +92,12 @@ class RootController < ApplicationController
     if publication && publication.type == "place"
       @options = load_place_options(publication)
     end
-    @artefact = artefact_api.artefact_for_slug(params[:slug])
     publication
+  end
+
+  def fetch_contact(params)
+    artefact = artefact_api.artefact_for_slug(params[:slug])
+    contact_api.contact_for_uri(artefact.contact_uri) if artefact.contact_uri.present?
   end
 
   def council_ons_from_geostack
