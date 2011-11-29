@@ -35,25 +35,4 @@ class PanopticonApiTest < ActiveSupport::TestCase
   test 'Should construct correct URL for a slug' do
     assert_equal "#{ENDPOINT}/artefacts/slug.js", api.url_for_slug('slug') # TODO change to .json in panopticon
   end
-
-  def artefact_with_contact_json
-    {
-      name: 'An artefact',
-      slug: 'an-artefact',
-      contact: {
-        name: 'Department for Environment, Food and Rural Affairs (Defra)',
-        email_address: 'helpline@defra.gsi.gov.uk'
-      }
-    }.to_json
-  end
-
-  test 'Contacts should be deserialised into whole objects' do
-    slug = 'an-artefact'
-    artefact_json = artefact_with_contact_json
-    stub_request(:get, "#{ENDPOINT}/artefacts/#{slug}.js").to_return(body: artefact_json) # TODO change to .json in panopticon
-
-    artefact = api.artefact_for_slug(slug)
-    assert_equal 'Department for Environment, Food and Rural Affairs (Defra)', artefact.contact.name
-    assert_equal 'helpline@defra.gsi.gov.uk', artefact.contact.email_address
-  end
 end
