@@ -47,6 +47,7 @@ class PageRenderingTest < ActionDispatch::IntegrationTest
 
   test "viewing a licence page with a location" do
     setup_api_responses('licence-generic')
+    GdsApi::Publisher.any_instance.expects(:council_for_name).with("westminster")
     visit "/licence-generic/westminster"
     assert page.status_code == 200
     assert page.has_content?("Licence overview copy"), %(expected there to be content Licence overview copy in #{page.text.inspect})
