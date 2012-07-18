@@ -42,7 +42,7 @@ class RootController < ApplicationController
       end
     when "local_transaction"
       @council = load_council(@publication, params[:edition])
-    elsif @publication.type == "licence"
+    when "licence"
       @location = params.delete(:part)
     else
       set_expiry if params.exclude?('edition')
