@@ -13,7 +13,7 @@ class RootController < ApplicationController
   rescue_from GdsApi::EndpointNotFound, with: :error_503
 
   def index
-    expires_in 60.minute, :public => true unless Rails.env.development?
+    set_expiry
 
     set_slimmer_headers(
       template:    "homepage",
@@ -34,17 +34,18 @@ class RootController < ApplicationController
     @artefact = fetch_artefact(params)
     set_slimmer_artefact_headers(@artefact)
 
-    if @publication.type == "place" and !request.format.kml?
-      unless (params.include? 'edition' || Rails.env.development?)
-        expires_in 60.minute, :public => true if request.get?
+    case @publication.type
+    when "place"
+      unless request.format.kml?
+        set_expiry if params.exclude?('edition') and request.get?
+        @options = load_place_options(@publication)
       end
-      @options = load_place_options(@publication)
-    elsif @publication.type == "local_transaction"
+    when "local_transaction"
       @council = load_council(@publication, params[:edition])
     elsif @publication.type == "licence"
       @location = params.delete(:part)
     else
-      expires_in 60.minute, :public => true unless (params.include? 'edition' || Rails.env.development?)
+      set_expiry if params.exclude?('edition')
     end
 
     if video_requested_but_not_found? || part_requested_but_not_found? || empty_part_list?
@@ -96,7 +97,7 @@ class RootController < ApplicationController
       end
     end
   rescue RecordNotFound
-    expires_in 60.minute, :public => true unless Rails.env.development?
+    set_expiry
     error 404
   end
 
@@ -238,5 +239,11 @@ protected
       format:      artefact.kind,
       proposition: artefact.business_proposition ? "business" : "citizen"
     )
+  end
+
+  def set_expiry
+    unless Rails.env.development?
+      expires_in(60.minutes, :public => true)
+    end
   end
 end
