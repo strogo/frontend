@@ -41,6 +41,8 @@ class RootController < ApplicationController
       @options = load_place_options(@publication)
     elsif @publication.type == "local_transaction"
       @council = load_council(@publication, params[:edition])
+    elsif @publication.type == "licence"
+      @location = params.delete(:part)
     else
       expires_in 60.minute, :public => true unless (params.include? 'edition' || Rails.env.development?)
     end

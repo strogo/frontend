@@ -45,6 +45,14 @@ class PageRenderingTest < ActionDispatch::IntegrationTest
     assert page.has_no_content?("--------") # Markdown should be rendered, not output
   end
 
+  test "viewing a licence page with a location" do
+    setup_api_responses('licence-generic')
+    visit "/licence-generic/westminster"
+    assert page.status_code == 200
+    assert page.has_content?("Licence overview copy"), %(expected there to be content Licence overview copy in #{page.text.inspect})
+    assert page.has_no_content?("--------") # Markdown should be rendered, not output
+  end
+
   test "viewing a business support page" do
     setup_api_responses("business-support-basic")
     visit "/business-support-basic"
